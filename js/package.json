@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@ben-hayes/magenta-music": "^1.12.2",
+    "@tensorflow/tfjs-node": "1.5.1",
+    "node-fetch": "2.6.0"
+  },
+  "name": "southbank_ai",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT"
+}
