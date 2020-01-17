@@ -1,3 +1,6 @@
 *.swp
-js/node_modules
+node_modules
+node_modules/*
+models/*
 checkpoints/*
+.DS_Store

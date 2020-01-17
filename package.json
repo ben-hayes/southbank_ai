@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@ben-hayes/magenta-music": "^1.12.2",
+    "@ben-hayes/magenta-music": "file:../../magenta-js/music",
     "@tensorflow/tfjs-node": "1.5.1",
     "node-fetch": "2.6.0"
   },
