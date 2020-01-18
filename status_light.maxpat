@@ -4,7 +4,7 @@
 		"appversion" : 		{
 			"major" : 8,
 			"minor" : 1,
-			"revision" : 0,
+			"revision" : 1,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
@@ -69,7 +69,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 128.0, 194.0, 115.0, 22.0 ],
+					"patching_rect" : [ 178.0, 190.0, 115.0, 22.0 ],
 					"text" : "oncolor 0. 1. 0. 1., 1"
 				}
 
@@ -81,7 +81,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 25.0, 194.0, 115.0, 22.0 ],
+					"patching_rect" : [ 55.25, 190.0, 115.0, 22.0 ],
 					"text" : "oncolor 1. 1. 0. 1., 1"
 				}
 
@@ -105,7 +105,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 233.5, 194.0, 115.0, 22.0 ],
+					"patching_rect" : [ 11.0, 190.0, 115.0, 22.0 ],
 					"text" : "oncolor 1. 0. 0. 1., 1"
 				}
 
@@ -118,7 +118,7 @@
 					"maxclass" : "led",
 					"numinlets" : 1,
 					"numoutlets" : 1,
-					"oncolor" : [ 1.0, 0.0, 0.0, 1.0 ],
+					"oncolor" : [ 0.0, 1.0, 0.0, 1.0 ],
 					"outlettype" : [ "int" ],
 					"parameter_enable" : 0,
 					"patching_rect" : [ 133.0, 234.0, 24.0, 24.0 ],

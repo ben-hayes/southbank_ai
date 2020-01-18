@@ -68,7 +68,6 @@ const handlers = {
         const note_sequence =
             m4l_tools.m4lListToQuantizedMagentaNoteSequence(max_note_list);
         training_sequences.push(note_sequence);
-        max_api.post(training_sequences);
     },
 
     train: epochs => {
