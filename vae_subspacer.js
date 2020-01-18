@@ -28,7 +28,6 @@ const midi_me = new model.MidiMe({epochs: 100, input_size: 512, latent_size: 4})
 const training_sequences = [];
 
 const initialize = async () => {
-    max_api.addHandlers(handlers);
     await music_vae.initialize();
     await midi_me.initialize();
 };
@@ -41,7 +40,7 @@ const handlers = {
         midi_me.saveModel(
             'file://' + encoder_directory,
             'file://' + decoder_directory)
-            .then(() => max_api.outlet("model_saved"));
+            .then(() => max_api.outlet(["model_saved", directory]));
     },
 
     loadModel: directory => {
@@ -52,7 +51,7 @@ const handlers = {
             'file://' + encoder_model,
             'file://' + decoder_model,
             true)
-            .then(() => max_api.outlet("model_loaded"));
+            .then(() => max_api.outlet(["model_loaded", directory]));
     },
 
     newModel: () => {
@@ -102,4 +101,5 @@ const handlers = {
     },
 };
 
+max_api.addHandlers(handlers);
 initialize().then(() => max_api.outlet("initialized"));
