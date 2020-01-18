@@ -1,7 +1,7 @@
 const path = require("path");
 
 const tf = require("@tensorflow/tfjs");
-require("@tensorflow/tfjs-node");
+require("@tensorflow/tfjs-node-gpu");
 
 const model = require("@ben-hayes/magenta-music/node/music_vae");
 const core = require("@ben-hayes/magenta-music/node/core");
@@ -20,7 +20,7 @@ globalAny.fetch = require("./fetch_hack.js");
 
 const music_vae = new model.MusicVAE(
     //"https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_lokl_q2"
-    "file://Users/benhayes/code/purcell_room_sessions/southbank_ai/checkpoints/cat-mel_2bar_big/"
+    "file://checkpoints/cat-mel_2bar_big/"
 );
 
 const midi_me = new model.MidiMe({epochs: 100, input_size: 512, latent_size: 4});
