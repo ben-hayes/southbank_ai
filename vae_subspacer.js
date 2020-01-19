@@ -1,7 +1,7 @@
 const path = require("path");
 
 const tf = require("@tensorflow/tfjs");
-//require("@tensorflow/tfjs-node-gpu");
+require("@tensorflow/tfjs-node-gpu");
 
 const model = require("@ben-hayes/magenta-music/node/music_vae");
 const core = require("@ben-hayes/magenta-music/node/core");
@@ -26,6 +26,7 @@ const music_vae = new model.MusicVAE(
 const midi_me = new model.MidiMe({epochs: 100, input_size: 128, latent_size: 4});
 
 const training_sequences = [];
+const chords = [];
 
 const initialize = async () => {
     await music_vae.initialize();
@@ -41,6 +42,14 @@ const handlers = {
             'file://' + encoder_directory,
             'file://' + decoder_directory)
             .then(() => max_api.outlet(["model_saved", directory]));
+    },
+
+    setChords: chord_string => {
+        chords.length = 0;
+
+        if (chord_string === "no_chords") return;
+
+        chord_string.split(" ").forEach(c => chords.push(c));
     },
 
     loadModel: directory => {
@@ -89,7 +98,7 @@ const handlers = {
         max_api.outlet("decoding");
         const z_midime = tf.tensor([z_in]);
         midi_me.decode(z_midime)
-            .then(z_musicvae => music_vae.decode(z_musicvae, undefined, ["Dm", "Ebm"]))
+            .then(z_musicvae => music_vae.decode(z_musicvae, undefined, ["C"]))
             .then(y => m4l_tools.outputNoteSequence(y[0].notes, {prefix: "decoded"}))
             .catch(err => {
                 max_api.outlet("decoding_error")
