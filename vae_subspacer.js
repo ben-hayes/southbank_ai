@@ -1,7 +1,7 @@
 const path = require("path");
 
 const tf = require("@tensorflow/tfjs");
-require("@tensorflow/tfjs-node-gpu");
+//require("@tensorflow/tfjs-node-gpu");
 
 const model = require("@ben-hayes/magenta-music/node/music_vae");
 const core = require("@ben-hayes/magenta-music/node/core");
@@ -19,11 +19,11 @@ globalAny.performance = Date;
 globalAny.fetch = require("./fetch_hack.js");
 
 const music_vae = new model.MusicVAE(
-    //"https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_lokl_q2"
-    "file://checkpoints/cat-mel_2bar_big/"
+    "https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_chords"
+    //"file://checkpoints/cat-mel_2bar_big/"
 );
 
-const midi_me = new model.MidiMe({epochs: 100, input_size: 512, latent_size: 4});
+const midi_me = new model.MidiMe({epochs: 100, input_size: 128, latent_size: 4});
 
 const training_sequences = [];
 
@@ -44,6 +44,7 @@ const handlers = {
     },
 
     loadModel: directory => {
+        if (directory === 0) return;
         const encoder_model = path.join(directory, 'encoder', 'model.json');
         const decoder_model = path.join(directory, 'decoder', 'model.json');
 
@@ -75,24 +76,31 @@ const handlers = {
         }
 
         max_api.outlet("training");
-        music_vae.encode(training_sequences)
+        music_vae.encode(training_sequences, ["Cm", "Fm"])
             .then(z => midi_me.train(z))
             .then(() => max_api.outlet("trained"))
-            .catch(() => max_api.outlet("training_error"));
+            .catch(err => {
+                max_api.outlet("training_error");
+                console.log(err);
+            });
     },
 
     decode: (...z_in) => {
         max_api.outlet("decoding");
         const z_midime = tf.tensor([z_in]);
         midi_me.decode(z_midime)
-            .then(z_musicvae => music_vae.decode(z_musicvae))
-            .then(y => m4l_tools.outputNoteSequence(y[0].notes, {prefix: "decoded"}));
+            .then(z_musicvae => music_vae.decode(z_musicvae, undefined, ["Dm", "Ebm"]))
+            .then(y => m4l_tools.outputNoteSequence(y[0].notes, {prefix: "decoded"}))
+            .catch(err => {
+                max_api.outlet("decoding_error")
+                console.log(err)
+            });
     },
 
     encode: (...max_note_list) => {
         const note_sequence =
             m4l_tools.m4lListToQuantizedMagentaNoteSequence(max_note_list);
-        music_vae.encode([note_sequence])
+        music_vae.encode([note_sequence], ["Cm", "Fm"])
             .then(z_musicvae => midi_me.encode(z_musicvae))
             .then(z_midime => {
                 const z_arr = z_midime.arraySync()[0];
