@@ -50,6 +50,7 @@ const handlers = {
         if (chord_string === "no_chords") return;
 
         chord_string.split(" ").forEach(c => chords.push(c));
+        console.log(chords);
     },
 
     loadModel: directory => {
@@ -85,7 +86,7 @@ const handlers = {
         }
 
         max_api.outlet("training");
-        music_vae.encode(training_sequences, ["Cm", "Fm"])
+        music_vae.encode(training_sequences, chords)
             .then(z => midi_me.train(z))
             .then(() => max_api.outlet("trained"))
             .catch(err => {
@@ -98,7 +99,7 @@ const handlers = {
         max_api.outlet("decoding");
         const z_midime = tf.tensor([z_in]);
         midi_me.decode(z_midime)
-            .then(z_musicvae => music_vae.decode(z_musicvae, undefined, ["C"]))
+            .then(z_musicvae => music_vae.decode(z_musicvae, undefined, chords))
             .then(y => m4l_tools.outputNoteSequence(y[0].notes, {prefix: "decoded"}))
             .catch(err => {
                 max_api.outlet("decoding_error")
@@ -109,7 +110,7 @@ const handlers = {
     encode: (...max_note_list) => {
         const note_sequence =
             m4l_tools.m4lListToQuantizedMagentaNoteSequence(max_note_list);
-        music_vae.encode([note_sequence], ["Cm", "Fm"])
+        music_vae.encode([note_sequence], chords)
             .then(z_musicvae => midi_me.encode(z_musicvae))
             .then(z_midime => {
                 const z_arr = z_midime.arraySync()[0];
