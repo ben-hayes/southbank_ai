@@ -16,7 +16,8 @@ class ResponsiveCNN {
         this.model.fit(X, y, {epochs: epochs, shuffle: true});
     }
 
-    predict () {
+    async predict (x) {
+        return this.model.predict(x);
     }
 
     getModel () {

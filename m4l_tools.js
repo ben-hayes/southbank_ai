@@ -51,7 +51,7 @@ function m4lListToTensor(
 
     const notes = m4lListToNoteList(max_note_list, steps_per_quarter);
 
-    const height = note_range[1] - note_range[0];
+    const height = note_range[1] - note_range[0] + 1;
 
     const output = tf
         .zeros([height, sequence_length])
