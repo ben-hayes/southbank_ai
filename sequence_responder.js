@@ -9,6 +9,7 @@ require('@tensorflow/tfjs-node-gpu');
 const note_range = [60, 64];
 const note_height = () => note_range[1] - note_range[0] + 1;
 let sequence_length = 16;
+let output_size = parseInt(process.argv[2]);
 
 const note_sequences = [];
 const targets = [];
@@ -27,15 +28,17 @@ const initialize = async () => {
     initInputSequence();
     rcnn.config.inputShape[0] = note_height();
     rcnn.config.inputShape[1] = sequence_length;
+    rcnn.config.outputSize = output_size || 4;
     await rcnn.initialize();
 };
 
 const handlers = {
     addTrainingExample: (...max_input) => {
-        const target = max_input.slice(0,4);
-        const max_note_list = max_input.slice(4);
+        const target = max_input.slice(0,output_size);
+        const max_note_list = max_input.slice(output_size);
         const output = m4l.m4lListToTensor(max_note_list, note_range, sequence_length);
-
+        max_api.post(max_note_list);
+        max_api.post(output);
         note_sequences.push(output);
         for (let i = 0; i < sequence_length; i++) targets.push(target);
     },

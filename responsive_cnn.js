@@ -2,9 +2,10 @@ const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-node-gpu');
 
 class ResponsiveCNN {
-    constructor (input_shape) {
+    constructor (input_shape, output_size) {
         this.config = {
             inputShape: input_shape || [127, 32, 1],
+            outputSize: output_size || 4,
         }
     }
 
@@ -39,7 +40,7 @@ class ResponsiveCNN {
         model.add(tf.layers.flatten());
 
         model.add(tf.layers.dense({
-            units: 4,
+            units: this.config.outputSize,
             kernelInitializer: 'randomUniform',
             activation: 'linear',
         }));

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@ben-hayes/magenta-music": "^1.12.4",
+    "@ben-hayes/magenta-music": "^1.12.5",
     "@tensorflow/tfjs-node": "^1.5.1",
     "@tensorflow/tfjs-node-gpu": "^1.5.1",
     "alert-node": "^2.1.1",
