@@ -7,7 +7,7 @@ require('@tensorflow/tfjs-node-gpu');
 
 //for now... const note_range = [0, 127]; // DEFAULT
 const note_range = [60, 64];
-const note_height = () => note_range[1] - note_range[0] + 1;
+const note_height = 128;// () => note_range[1] - note_range[0] + 1;
 let sequence_length = 16;
 let output_size = parseInt(process.argv[2]);
 
@@ -17,18 +17,16 @@ const targets = [];
 const input_sequence = [];
 const initInputSequence = () => {
     input_sequence.length = 0;
-    for (let i = 0; i < note_height(); i++) {
+    for (let i = 0; i < note_height; i++) {
         input_sequence.push(Array(sequence_length).fill(0));
     }
 };
 
-const rcnn = new ResponsiveCNN();
+let rcnn;
 
 const initialize = async () => {
     initInputSequence();
-    rcnn.config.inputShape[0] = note_height();
-    rcnn.config.inputShape[1] = sequence_length;
-    rcnn.config.outputSize = output_size || 4;
+    rcnn = new ResponsiveCNN(note_range, sequence_length, output_size);
     await rcnn.initialize();
 };
 
@@ -36,7 +34,7 @@ const handlers = {
     addTrainingExample: (...max_input) => {
         const target = max_input.slice(0,output_size);
         const max_note_list = max_input.slice(output_size);
-        const output = m4l.m4lListToTensor(max_note_list, note_range, sequence_length);
+        const output = m4l.m4lListToTensor(max_note_list, [0, 127], sequence_length);
         max_api.post(max_note_list);
         max_api.post(output);
         note_sequences.push(output);
@@ -49,7 +47,7 @@ const handlers = {
     },
 
     trainModel: () => {
-        const X = tf.concat(note_sequences, axis=0).expandDims(3);
+        const X = tf.concat(note_sequences, 0).expandDims(3);
         const y = tf.tensor(targets);
 
         max_api.post(X); 
@@ -58,7 +56,7 @@ const handlers = {
 
     predict: () => {
         const x = tf.tensor(input_sequence).expandDims(0).expandDims(3);
-        rcnn.predict(x).then(y => max_api.outlet(y.arraySync()[0]));
+        rcnn.predict(x).then(y => max_api.outlet(["prediction", ...y.arraySync()[0]]));
     },
 
     setNoteRange: (lo, hi) => {
@@ -80,15 +78,23 @@ const handlers = {
         }
 
         for (let note of notes) {
-            if (note != -1 && note >= note_range[0] && note <= note_range[1]) {
-                input_sequence[note - note_range[0]][time_step] = 1;
+            if (note != -1) {
+                input_sequence[note][time_step] = 1;
             }
+            //if (note != -1 && note >= note_range[0] && note <= note_range[1]) {
+            //    input_sequence[note - note_range[0]][time_step] = 1;
+            //}
         }
     },
 
     dumpReceived: () => {
         max_api.post(note_height());
         max_api.post(input_sequence);
+    },
+
+    saveModel: directory => {
+        rcnn.saveModel('file:///' + directory)
+            .then(() => max_api.outlet(["model_saved", directory]));
     },
 }
 

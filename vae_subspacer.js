@@ -93,6 +93,7 @@ const initialize = async () => {
                 + path.join(midi_me_saved_model, 'encoder', 'model.json'),
             "file://" 
                 + path.join(midi_me_saved_model, 'decoder', 'model.json'));
+        max_api.outlet(["model_loaded", midi_me_saved_model]);
     }
 };
 
