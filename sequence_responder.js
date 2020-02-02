@@ -1,4 +1,5 @@
 const max_api = require('max-api');
+const path = require('path');
 const m4l = require('./m4l_tools.js');
 const ResponsiveCNN = require('./responsive_cnn.js');
 
@@ -6,10 +7,10 @@ const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-node-gpu');
 
 //for now... const note_range = [0, 127]; // DEFAULT
-const note_range = [60, 64];
-const note_height = () => note_range[1] - note_range[0] + 1;
+const note_height = 128;// () => note_range[1] - note_range[0] + 1;
 let sequence_length = 16;
 let output_size = parseInt(process.argv[2]);
+let saved_model = process.argv[3];
 
 const note_sequences = [];
 const targets = [];
@@ -17,26 +18,28 @@ const targets = [];
 const input_sequence = [];
 const initInputSequence = () => {
     input_sequence.length = 0;
-    for (let i = 0; i < note_height(); i++) {
+    for (let i = 0; i < note_height; i++) {
         input_sequence.push(Array(sequence_length).fill(0));
     }
 };
 
-const rcnn = new ResponsiveCNN();
+const rcnn = new ResponsiveCNN(sequence_length, output_size);
 
 const initialize = async () => {
     initInputSequence();
-    rcnn.config.inputShape[0] = note_height();
-    rcnn.config.inputShape[1] = sequence_length;
-    rcnn.config.outputSize = output_size || 4;
-    await rcnn.initialize();
+    if (saved_model === "none" || saved_model === 0) {
+        await rcnn.initialize();
+    } else {
+        const model_file = path.join(saved_model, 'model.json');
+        await rcnn.initializeFromFile('file://' + model_file);
+    }
 };
 
 const handlers = {
     addTrainingExample: (...max_input) => {
         const target = max_input.slice(0,output_size);
         const max_note_list = max_input.slice(output_size);
-        const output = m4l.m4lListToTensor(max_note_list, note_range, sequence_length);
+        const output = m4l.m4lListToTensor(max_note_list, [0, 127], sequence_length);
         max_api.post(max_note_list);
         max_api.post(output);
         note_sequences.push(output);
@@ -48,50 +51,74 @@ const handlers = {
         targets.length = 0;
     },
 
-    trainModel: () => {
-        const X = tf.concat(note_sequences, axis=0).expandDims(3);
-        const y = tf.tensor(targets);
+    trainModel: epochs => {
+        max_api.outlet("training");
 
-        max_api.post(X); 
-        rcnn.train(X, y);
+        const lossLogger = async (epoch, logs) => {
+            const val_loss = logs.val_loss;
+            const loss = logs.loss;
+
+            max_api.outlet(["loss", loss]);
+            max_api.outlet(["val_loss", val_loss]);
+            max_api.outlet(["epoch", epoch]);
+        };
+
+        try {
+            const X = tf.concat(note_sequences, 0).expandDims(1);
+            const y = tf.tensor(targets);
+            rcnn.train(X, y, epochs, lossLogger)
+                .then(() => max_api.outlet("trained"))
+                .catch(msg => {
+                    max_api.outlet("training_error")
+                    console.log(msg);
+                });
+        } catch (e) {
+            max_api.outlet("training_error");
+        }
+
     },
 
     predict: () => {
-        const x = tf.tensor(input_sequence).expandDims(0).expandDims(3);
-        rcnn.predict(x).then(y => max_api.outlet(y.arraySync()[0]));
-    },
-
-    setNoteRange: (lo, hi) => {
-        note_range[0] = lo;
-        note_range[1] = hi;
-
-        if (hi > lo) {
-            initInputSequence();
-            initialize();
-        }
+        const x = tf.tensor(input_sequence).expandDims(0).expandDims(1);
+        rcnn.predict(x).then(y => max_api.outlet(["prediction", ...y.arraySync()[0]]));
     },
 
     receivedNotes: (...max_input) => {
         let time_step = max_input[0];
         let notes = max_input.slice(1);
 
-        for (let i = 0; i < note_height(); i++) {
+        for (let i = 0; i < 128; i++) {
             input_sequence[i][time_step] = 0;
         }
 
         for (let note of notes) {
-            if (note != -1 && note >= note_range[0] && note <= note_range[1]) {
-                input_sequence[note - note_range[0]][time_step] = 1;
+            if (note != -1) {
+                input_sequence[note][time_step] = 1;
             }
         }
     },
 
-    dumpReceived: () => {
-        max_api.post(note_height());
-        max_api.post(input_sequence);
+    saveModel: directory => {
+        rcnn.saveModel('file:///' + directory)
+            .then(() => max_api.outlet(["model_saved", directory]));
+    },
+
+    loadModel: directory => {
+        if (directory === 0) return;
+        const model_file = path.join(directory, 'model.json');
+
+        rcnn.initializeFromFile('file://' + model_file)
+            .then(() => {
+                max_api.outlet(["model_loaded", directory]);
+            });
+    },
+
+    createNewModel: () => {
+        rcnn.initialize();
+        max_api.post("model_created");
     },
 }
 
 max_api.addHandlers(handlers);
 
-initialize().then(() => max_api.post("initialized"));
+initialize().then(() => max_api.outlet("initialized"));

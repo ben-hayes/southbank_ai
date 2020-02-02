@@ -1,20 +1,38 @@
+const path = require("path");
+const fs = require("fs");
 const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-node-gpu');
 
 class ResponsiveCNN {
-    constructor (input_shape, output_size) {
+    constructor (sequence_length, output_size) {
         this.config = {
-            inputShape: input_shape || [127, 32, 1],
+            inputShape: [1, 128, sequence_length || 16],
             outputSize: output_size || 4,
-        }
+            sequenceLength: sequence_length || 16,
+        };
     }
 
     async initialize () {
         this.model = this.getModel();
     }
 
-    train (X, y, epochs=100) {
-        this.model.fit(X, y, {epochs: epochs, shuffle: true});
+    async train (X, y, epochs=100, lossLogger) {
+        let callbacks;
+        if (lossLogger !== undefined) {
+            callbacks = {
+                onEpochEnd: lossLogger,
+            };
+        }
+        await this.model.fit(
+            X,
+            y,
+            {
+                epochs: epochs,
+                shuffle: true,
+                validationSplit: 0.1,
+                callbacks: callbacks,
+            },
+        );
     }
 
     async predict (x) {
@@ -25,9 +43,24 @@ class ResponsiveCNN {
         const model = tf.sequential();
         model.add(tf.layers.conv2d({
             inputShape: this.config.inputShape,
-            kernelSize: [this.config.inputShape[0], 4],
+            kernelSize: [128, 5],
+            filters: 16,
+            padding: 'same',
+            strides: [128, 1],
+            activation: 'relu',
+            kernelInitializer: 'randomUniform',
+        }));
+
+        model.add(tf.layers.maxPooling2d({
+            poolSize: [1, 2],
+            strides: [1, 2],
+        }));
+
+        model.add(tf.layers.conv2d({
+            kernelSize: [1, 3],
             filters: 8,
-            strides: 1,
+            padding: 'same',
+            strides: [1, 1],
             activation: 'relu',
             kernelInitializer: 'randomUniform',
         }));
@@ -52,6 +85,14 @@ class ResponsiveCNN {
         });
 
         return model;
+    }
+
+    async saveModel (file_path) {
+        await this.model.save(file_path);
+    }
+
+    async initializeFromFile (file_path) {
+        this.model = await tf.loadLayersModel(file_path);
     }
 }
 
