@@ -4,20 +4,19 @@ const tf = require("@tensorflow/tfjs");
 require("@tensorflow/tfjs-node-gpu");
 
 const model = require("@ben-hayes/magenta-music/node/music_vae");
-const core = require("@ben-hayes/magenta-music/node/core");
 const max_api = require("max-api");
 const m4l_tools = require("./m4l_tools.js");
 
 const alert = require("alert-node");
 
 const DEFAULT_SEQUENCE_LENGTH = 32;
-const STEPS_PER_QUARTER = 4;
-const DEFAULT_VELOCITY = 100;
-const DEFAULT_MUTED = 0;
 const DEFAULT_BETA = 1;
 const LCD_WIDTH = 162;
 const LCD_HEIGHT = 162;
 const LCD_MARGIN = 8;
+
+let hold_results = false;
+let output_sequence = [ ];
 
 let beta = DEFAULT_BETA;
 let seq_length = DEFAULT_SEQUENCE_LENGTH;
@@ -193,11 +192,23 @@ const handlers = {
                 z_musicvae,
                 undefined,
                 currentVAEIsChordModel() ? chords : undefined))
-            .then(y => m4l_tools.outputNoteSequence(y[0].notes, {prefix: "decoded"}))
+            .then(y => output_sequence = y[0].notes)
+            .then(() => {
+                if (!hold_results) {
+                    m4l_tools.outputNoteSequence(output_sequence, {prefix: "decoded"});
+                }
+            })
             .catch(err => {
                 max_api.outlet("decoding_error")
                 console.log(err)
             });
+    },
+
+    dumpResults: () => {
+        if (output_sequence.length > 0) {
+            m4l_tools.outputNoteSequence(output_sequence, {prefix: "decoded"});
+        }
+        output_sequence = [ ];
     },
 
     encode: (...max_note_list) => {
@@ -259,13 +270,16 @@ const handlers = {
                 const output = t.div(max).mul(255).arraySync();
 
                 for (let x = 0; x < LCD_WIDTH; x++) {
-                    const row = [];
                     for (let y = 0; y < LCD_HEIGHT; y++) {
                         const c = output[x][y];
                         max_api.outlet(["to_lcd", "setpixel", x, y, c[0], c[1], c[2]]);
                     }
                 }
             });
+    },
+
+    setHoldResults: hold => {
+        hold_results = hold === 1 ? true : false;
     },
 
     setBeta: new_beta => {
