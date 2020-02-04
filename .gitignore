@@ -5,3 +5,4 @@ models/*
 checkpoints/*
 .DS_Store
 dist/*
+releases/*
