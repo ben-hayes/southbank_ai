@@ -17,18 +17,26 @@ There are three main components to this suite:
 
 ### VAE Subspacer
 
+![Image of 2D VAE Subspacer](https://github.com/ben-hayes/southbank_ai/raw/master/img/vae_subspacer_2d.png)
+
 This loads an instance of MusicVAE, initialised from a checkpoint ([Magenta have a number of pretrained ones here](https://github.com/tensorflow/magenta-js/tree/master/music/checkpoints)). It can then train a second, smaller VAE to reconstruct the MusicVAE latent codes of given training examples, creating an explorable subspace of (hopefully) musically connected ideas.
 
 There are 2-dimensional and 4-dimensional versions, with the 2D one offering pretty visualisations of the training examples projected into its latent space.
 
+![Image of 4D VAE Subspacer](https://github.com/ben-hayes/southbank_ai/raw/master/img/vae_subspacer.png)
+
 It is possible to save and load models — if a model is saved or loaded, this is saved with the Ableton Live set, meaning it is restored when the project is open.
 
 ### Sequence Responder
+
+![Image of Sequence Responder](https://github.com/ben-hayes/southbank_ai/raw/master/img/sequence_responder.png)
 
 This constructs a simple CNN which learns to predict VAE Subspacer latent codes given a bar of MIDI. Essentially this is a learned translation invariant feature extractor tacked onto a simple linear regression model. In combination with the musical closeness (ideally) of the VAE Subspacer latent space, this generally results in loosely similar input creating loosely similar output, meaning that it's possible to "jam" musical ideas with this system, and play off one another.
 
 The device is designed to work in combination with the MIDI Capture device (described below), and so responds in realtime to incoming streams of MIDI.
 
 ### MIDI Capture
+
+![Image of MIDI Capture](https://github.com/ben-hayes/southbank_ai/raw/master/img/midi_capture.png)
 
 This real-time quantises incoming MIDI to 16th notes, and sends it globally throughout the Ableton Live set to the named receiver. This is designed to work with the Sequence Responder for real-time musical interaction.
