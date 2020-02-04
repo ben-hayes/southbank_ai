@@ -2,7 +2,7 @@
 	"name" : "vae_subspacer_2d",
 	"version" : 1,
 	"creationdate" : 3663676404,
-	"modificationdate" : 3663676623,
+	"modificationdate" : 3663677806,
 	"viewrect" : [ 25.0, 104.0, 300.0, 500.0 ],
 	"autoorganize" : 1,
 	"hideprojectwindow" : 0,
