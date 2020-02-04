@@ -2,7 +2,7 @@
 	"name" : "sequence_responder",
 	"version" : 1,
 	"creationdate" : 3663676840,
-	"modificationdate" : 3663676853,
+	"modificationdate" : 3663676956,
 	"viewrect" : [ 25.0, 104.0, 300.0, 500.0 ],
 	"autoorganize" : 1,
 	"hideprojectwindow" : 0,
@@ -50,7 +50,7 @@
 	}
 ,
 	"detailsvisible" : 0,
-	"amxdtype" : 1633771873,
+	"amxdtype" : 1835887981,
 	"readonly" : 0,
 	"devpathtype" : 0,
 	"devpath" : ".",

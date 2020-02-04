@@ -2,7 +2,7 @@
 	"name" : "midi_capture",
 	"version" : 1,
 	"creationdate" : 3663676805,
-	"modificationdate" : 3663676818,
+	"modificationdate" : 3663676945,
 	"viewrect" : [ 25.0, 104.0, 300.0, 500.0 ],
 	"autoorganize" : 1,
 	"hideprojectwindow" : 0,
@@ -46,7 +46,7 @@
 	}
 ,
 	"detailsvisible" : 0,
-	"amxdtype" : 1633771873,
+	"amxdtype" : 1835887981,
 	"readonly" : 0,
 	"devpathtype" : 0,
 	"devpath" : ".",

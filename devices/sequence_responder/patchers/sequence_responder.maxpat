@@ -5455,6 +5455,14 @@
 					"numoutlets" : 2,
 					"outlettype" : [ "", "" ],
 					"patching_rect" : [ 199.0, 608.0, 176.0, 20.0 ],
+					"saved_object_attributes" : 					{
+						"autostart" : 0,
+						"defer" : 0,
+						"node_bin_path" : "",
+						"npm_bin_path" : "",
+						"watch" : 0
+					}
+,
 					"text" : "node.script sequence_responder.js"
 				}
 
@@ -6153,6 +6161,13 @@
 		}
 ,
 		"dependency_cache" : [ 			{
+				"name" : "sequence_responder.js",
+				"bootpath" : "~/code/southbank_ai/js",
+				"patcherrelativepath" : "../../../js",
+				"type" : "TEXT",
+				"implicit" : 1
+			}
+, 			{
 				"name" : "n4m.monitor.maxpat",
 				"bootpath" : "~/code/southbank_ai/devices/sequence_responder/patchers",
 				"patcherrelativepath" : ".",

@@ -907,45 +907,19 @@
 ,
 		"dependency_cache" : [ 			{
 				"name" : "M4L.api.ObserveTransport.maxpat",
-				"bootpath" : "C74:/patchers/m4l/LiveAPI resources/abstractions",
+				"bootpath" : "~/code/southbank_ai/devices/midi_capture/patchers",
+				"patcherrelativepath" : ".",
 				"type" : "JSON",
 				"implicit" : 1
 			}
+, 			{
+				"name" : "midi_capture.js",
+				"bootpath" : "~/code/southbank_ai/js",
+				"patcherrelativepath" : "../../../js",
+				"type" : "TEXT",
+				"implicit" : 1
+			}
  ],
-		"project" : 		{
-			"name" : "midi_capture.amxd",
-			"version" : 1,
-			"creationdate" : 3590052786,
-			"modificationdate" : 3590052786,
-			"viewrect" : [ 0.0, 0.0, 300.0, 500.0 ],
-			"autoorganize" : 1,
-			"hideprojectwindow" : 1,
-			"showdependencies" : 1,
-			"autolocalize" : 0,
-			"contents" : 			{
-				"patchers" : 				{
-
-				}
-
-			}
-,
-			"layout" : 			{
-
-			}
-,
-			"searchpath" : 			{
-
-			}
-,
-			"detailsvisible" : 0,
-			"amxdtype" : 1835887981,
-			"readonly" : 0,
-			"devpathtype" : 0,
-			"devpath" : ".",
-			"sortmode" : 0,
-			"viewmode" : 0
-		}
-,
 		"autosave" : 0
 	}
 
