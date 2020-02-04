@@ -4,3 +4,4 @@ node_modules/*
 models/*
 checkpoints/*
 .DS_Store
+dist/*
