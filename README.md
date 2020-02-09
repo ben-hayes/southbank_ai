@@ -9,6 +9,8 @@ The handful of tools here are designed to allow quick and flexible interaction w
 These tools, and the code behind them, are very experimental and were hacked together alongside conceiving a creative performance. They are _not_ well coded. They're full of bugs and in need of a big refactor (seriously, it's a mess in there). If you want a set of robust in-DAW tools for interacting with compositional AI, look no further than Google's [Magenta Studio](https://github.com/tensorflow/magenta-studio).
 However, if you want to have a little more flexibility, get a little more under the hood, produce some unexpected results, and most importantly jam with AI in "realtime", these tools might be for you.
 
+Further massive disclaimer: as these were built alongside a creative project under immense time pressure, very little attention was paid to the ineraction design, so they are fiddly to work with. If they do not function as expected, feel free to drop me an email at ben@benhayes.net and I will try to help you get them working.
+
 A few acknowledgements are necessary — the core of the deep learning here is Google Magenta's awesome MusicVAE [model](https://magenta.tensorflow.org/music-vae). And furthermore, none of this could have been achieved were it not for their excellent [JS ports](https://magenta.tensorflow.org/js-announce) of their models (a shoutout also to [TensorFlow.js](https://www.tensorflow.org/js)). Also, big gratitude to Cycling '74 for [Node for Max](https://docs.cycling74.com/nodeformax/api/), which indirectly makes GPU accelerated deep learning inside of Ableton Live possible.
 
 ## The tools
